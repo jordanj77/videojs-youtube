@@ -54,7 +54,7 @@
 
       // Create the Quality button
       this.qualityButton = document.createElement('div');
-      this.qualityButton.setAttribute('class', 'vjs-quality-button vjs-menu-button vjs-control');
+      this.qualityButton.setAttribute('class', 'vjs-quality-button vjs-menu-button vjs-control hidden');
       this.qualityButton.setAttribute('tabindex', 0);
 
       var qualityContent = document.createElement('div');
@@ -118,8 +118,16 @@
       var self = this;
 
       player.ready(function() {
-        var controlBar = self.playerEl_.querySelectorAll('.vjs-control-bar')[0];
-        controlBar.appendChild(self.qualityButton);
+
+        // RH: On our player, we want it here
+        var controlBar = self.playerEl_.querySelectorAll('.vjs-resolution-control')[0];
+        if (controlBar) {
+          controlBar.parentNode.insertBefore(self.qualityButton, controlBar.nextSibling);
+        } else {
+          // Otherwise, original behaviour
+          controlBar = self.playerEl_.querySelectorAll('.vjs-control-bar')[0];
+          controlBar.appendChild(self.qualityButton);
+        }
 
         if(self.playOnReady && !self.player_.options()['ytcontrols']) {
           if(typeof self.player_.loadingSpinner !== 'undefined') {
@@ -741,6 +749,7 @@
   };
 
   videojs.Youtube.prototype.onPlaybackQualityChange = function(quality) {
+    videojs.Youtube.removeClass(this.qualityButton, 'hidden');
     if(typeof this.defaultQuality === 'undefined') {
       this.defaultQuality = quality;
 
